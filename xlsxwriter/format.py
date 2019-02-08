@@ -28,8 +28,7 @@ class Format(xmlwriter.XMLwriter):
         Constructor.
 
         """
-        if properties is None:
-            properties = {}
+        self.properties = {} if properties is None else properties
 
         super(Format, self).__init__()
 
@@ -106,10 +105,22 @@ class Format(xmlwriter.XMLwriter):
         self.font_only = 0
 
         # Convert properties in the constructor to method calls.
-        for key, value in properties.items():
+        for key, value in self.properties.items():
             getattr(self, 'set_' + key)(value)
 
         self._format_key = None
+
+    def clone(self, extra_properties=None, xf_indices=None, dxf_indices=None):
+        properties = self.properties.copy()
+        if extra_properties is not None:
+            properties.update(extra_properties)
+
+        if xf_indices is None:
+            xf_indices = self.xf_format_indices
+        if dxf_indices is None:
+            dxf_indices = self.dxf_format_indices
+
+        return self.__class__(properties, xf_indices, dxf_indices)
 
     ###########################################################################
     #
